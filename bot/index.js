@@ -2,6 +2,8 @@
 // Actual bot implementation
 //
 
+const util = require('./util')
+
 module.exports = {
 	// Configuration
 	config: null,
@@ -15,25 +17,33 @@ module.exports = {
 	// Discord.js Client
 	client: null,
 
+	// Utilities
+	util: null,
+
 	// Run when the database and the client is connected
 	run() {
+		// Instanciate utilities
+		this.util = util(this)
+
 		// Add listener for Discord messages
 		this.client.on('message', (message) => this.handleMessage(message))
 	},
 
 	// Handle a message from Discord.js
 	handleMessage(message) {
+		let args = message.content.split(' ')
+
 		// Check if the message starts with the required prefix
-		if (!message.content.startsWith(this.config.prefix)) {
+		if (args[0] !== this.config.prefix) {
 			return
 		}
 
 		// Create an array of arguments passed to the bot
-		let args = message.content.split(' ').slice(1)
+		args = args.slice(1)
 
-		// If no arguments are present, imply the "start" action
+		// If no arguments are present, imply the "status" action
 		if (args.length === 0) {
-			args = ['start']
+			args = ['status']
 		}
 
 		// Run the right message handler
@@ -45,7 +55,12 @@ module.exports = {
 		}
 
 		// Run the handler
-		handler.handler(message)
+		handler.handler({
+			bot: this,
+			util: this.util,
+			args,
+			message
+		})
 	},
 
 	// Handlers for different main commands
@@ -53,17 +68,36 @@ module.exports = {
 		// Handler run when a command has not been found
 		{
 			commands: ['404'],
-			handler(message) {
-				message.channel.send('That command does not exist !')
+			async handler({ bot, message }) {
+				let m = await message.channel.send(
+					`❌ That command does not exist. Get the full list of commands right in your inbox with **${
+						bot.config.prefix
+					} help**.`
+				)
+
+				// Delete the message after 12 seconds
+				setTimeout(() => {
+					m.delete()
+				}, 12000)
 			}
 		},
 
-		// Start a pomodoro timer
+		// Status of the currently assigned pom
+		{
+			commands: ['status'],
+			handler: require('../handlers/status')
+		},
+
+		// Start a new pom (for this user)
 		{
 			commands: ['start'],
-			handler(message) {
-				message.channel.send('Start pomodoro !')
-			}
+			handler: require('../handlers/start')
+		},
+
+		// Stop a pom (for this user)
+		{
+			commands: ['stop', 'leave'],
+			handler: require('../handlers/stop')
 		}
 	]
 }
