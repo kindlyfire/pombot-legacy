@@ -1,0 +1,16 @@
+{
+  "name": "pombot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tijl Van den Brugghen <me@tijlvdb.me> (https://tijlvdb.me)",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^11.4.2",
+    "rethinkdb": "^2.3.3",
+    "uws": "^100.0.1"
+  }
+}
