@@ -118,6 +118,18 @@ module.exports = {
 		{
 			commands: ['stop', 'leave'],
 			handler: require('../handlers/stop')
+		},
+
+		// Join a pom (from another usr)
+		{
+			commands: ['join'],
+			handler: require('../handlers/join')
+		},
+
+		// Help
+		{
+			commands: ['help'],
+			handler: require('../handlers/help')
 		}
 	]
 }
