@@ -3,6 +3,7 @@
 //
 
 const Discord = require('discord.js')
+const handlePomDone = require('../tasks/done')
 
 module.exports = async ({ bot, message, util, args }) => {
 	// Check if the user has a pomodoro already
@@ -49,10 +50,11 @@ module.exports = async ({ bot, message, util, args }) => {
 			.table('poms')
 			.insert(pom)
 			.run(bot.conn)
+		pom.id = res.generated_keys[0]
 
 		let userPom = {
 			userId: message.author.id,
-			pomId: res.generated_keys[0],
+			pomId: pom.id,
 			joinedAt: Math.floor(Date.now() / 1000)
 		}
 
@@ -60,6 +62,9 @@ module.exports = async ({ bot, message, util, args }) => {
 			.table('user_poms')
 			.insert(userPom)
 			.run(bot.conn)
+
+		// Set completion timeout
+		setTimeout(() => handlePomDone({ bot, pom }), pomLength * 60 * 1000)
 
 		// Send the user a confirmation message
 		let pomInfo = util.getPomInformation(pom)

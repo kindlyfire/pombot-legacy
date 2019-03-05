@@ -52,7 +52,8 @@ module.exports = (bot) => ({
 			timeLeft:
 				timeLeftMinutes > 0
 					? `${timeLeftMinutes}m ${timeLeftSeconds}s`
-					: `${timeLeftSeconds}s`
+					: `${timeLeftSeconds}s`,
+			timeLeftInt: timeLeft
 		}
 	},
 

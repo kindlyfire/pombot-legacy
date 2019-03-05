@@ -3,6 +3,7 @@
 //
 
 const util = require('./util')
+const handlePomDone = require('../tasks/done')
 
 module.exports = {
 	// Configuration
@@ -27,6 +28,9 @@ module.exports = {
 
 		// Add listener for Discord messages
 		this.client.on('message', (message) => this.handleMessage(message))
+
+		// Load timeouts for poms in database
+		this.loadPoms()
 	},
 
 	// Handle a message from Discord.js
@@ -61,6 +65,22 @@ module.exports = {
 			args,
 			message
 		})
+	},
+
+	// Load poms from database
+	async loadPoms() {
+		let poms = await this.util.queryArray(this.db.table('poms'))
+
+		for (let pom of poms) {
+			let pomInfo = this.util.getPomInformation(pom)
+
+			setTimeout(
+				() => handlePomDone({ bot: this, pom }),
+				pomInfo.timeLeftInt * 1000
+			)
+		}
+
+		console.log(`Loaded ${poms.length} poms from the database.`)
 	},
 
 	// Handlers for different main commands
