@@ -25,6 +25,15 @@ module.exports = async ({ bot, message }) => {
 			`${bot.config.prefix} join @user`,
 			`Join another user in his pomodoro adventure !`
 		)
+		.addField(
+			`${bot.config.prefix} leaderboard`,
+			`Show the top-10 pommers of the server you are in.
+			Alias: **${bot.config.prefix} lb**`
+		)
+		.addField(
+			`${bot.config.prefix} stats`,
+			`Show number of users, time tracked, poms started and poms finished count of this server.`
+		)
 
 	await message.author.send({ embed })
 

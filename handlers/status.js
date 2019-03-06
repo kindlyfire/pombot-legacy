@@ -10,6 +10,9 @@ module.exports = async ({ bot, message, util }) => {
 
 	// If he has, return the information
 	if (pom) {
+		// Check if the pom was started in this channel
+		let pomStartedHere = pom.channelId === message.channel.id
+
 		let pomInfo = util.getPomInformation(pom)
 
 		// Get a list of users in the pom, with their profile data
@@ -19,6 +22,11 @@ module.exports = async ({ bot, message, util }) => {
 				.getAll(pom.id, { index: 'pomId' })
 				.eqJoin('userId', bot.db.table('profiles'), { index: 'userId' })
 				.zip()
+		)
+
+		// Filter out any profiles that are not in this server
+		pomUsers = pomUsers.filter(
+			(u) => u.serverId === (message.guild ? message.guild.id : '')
 		)
 
 		let embed = new Discord.RichEmbed()
@@ -31,13 +39,14 @@ module.exports = async ({ bot, message, util }) => {
 					(pomUsers.length > 1
 						? ` with ${pomUsers.length - 1} other ${
 								pomUsers.length === 2 ? 'person' : 'people'
-						  }.`
-						: '.')
+						  }`
+						: '') +
+					(!pomStartedHere ? ` somewhere else.` : '.')
 			)
 			.addField('Started at', pomInfo.startedAt, true)
 			.addField('Time left', pomInfo.timeLeft, true)
 
-		if (pomUsers.length > 1) {
+		if (pomUsers.length > 1 && pomStartedHere) {
 			embed.addField(
 				'Participants',
 				`(${pomUsers.length}) ` +
