@@ -21,7 +21,7 @@ interface user_poms {
 // Indexes: userId, serverId
 interface profiles {
 	userId: string // Discord User ID
-	serverId: string // Discord Server ID
+	serverId?: string // Discord Server ID
 	tag: string // Discord User tag
 	avatarURL: string // Discord User avatarURL
 	pomsStarted: number

@@ -136,6 +136,12 @@ module.exports = {
 		{
 			commands: ['lb', 'leaderboard'],
 			handler: require('../handlers/leaderboard')
+		},
+
+		// Stats
+		{
+			commands: ['stats'],
+			handler: require('../handlers/stats')
 		}
 	]
 }

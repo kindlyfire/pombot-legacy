@@ -12,7 +12,7 @@ module.exports = async ({ bot, message, util, args }) => {
 	// Get profile
 	let profile = await util.getUserProfile(
 		message.author.id,
-		message.guild.id,
+		message.guild ? message.guild.id : '',
 		message.author
 	)
 

@@ -124,5 +124,31 @@ module.exports = (bot) => ({
 		return (
 			Math.floor(Date.now() / 1000) + new Date().getTimezoneOffset() * 60
 		)
+	},
+
+	// Format a number of seconds (eg 605) into a nice string
+	//  like 10m 5s
+	formatSeconds(s) {
+		let hours = Math.floor(s / 3600)
+		s = s % 3600
+
+		let minutes = Math.floor(s / 60)
+		s = s % 60
+
+		let str = ''
+
+		if (hours) {
+			str = `${hours}h`
+		}
+
+		if (minutes) {
+			str += `${minutes}m `
+		}
+
+		if (s || (!hours && !minutes)) {
+			str += `${s}s`
+		}
+
+		return str.trim()
 	}
 })

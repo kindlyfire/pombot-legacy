@@ -5,6 +5,16 @@
 const Discord = require('discord.js')
 
 module.exports = async ({ bot, message, util }) => {
+	// It's not possible to use "leaderboard" in a DM channel
+	// Prevent that
+	if (
+		message.author.dmChannel &&
+		message.author.dmChannel.id === message.channel.id
+	) {
+		message.channel.send(`❌ There is no leaderboard for DM channels`)
+		return
+	}
+
 	// Get all profiles belonging to this server/guild,
 	//  order by pomsTotalTime, limit to 10
 	let profiles = await util.queryArray(
@@ -30,13 +40,7 @@ module.exports = async ({ bot, message, util }) => {
 				? `**${profile.tag}**`
 				: profile.tag
 
-		let timeHours = Math.floor(profile.pomsTotalTime / 3600)
-		let timeMinutes = Math.floor(
-			(profile.pomsTotalTime - timeHours * 3600) / 60
-		)
-
-		let timeStr =
-			timeHours > 0 ? `${timeHours}h ${timeMinutes}m` : `${timeMinutes}m`
+		let timeStr = util.formatSeconds(profile.pomsTotalTime)
 
 		profileList.push(`**${i + 1}.** ${profileTagStr} • ${timeStr}`)
 	}
