@@ -15,7 +15,7 @@ module.exports = async ({ bot, message, util, args }) => {
 	// If he has, yell at him for overworking
 	if (pom) {
 		message.channel.send(
-			`You are already participating in a pomodoro timer. Don't get overworked ! 🙃`
+			`❌ You are already participating in a pomodoro timer. Don't get overworked ! 🙃`
 		)
 	}
 
@@ -29,12 +29,12 @@ module.exports = async ({ bot, message, util, args }) => {
 			let msg
 
 			if (isNaN(pomLength)) {
-				msg = `Give me some real time, bro ! Can't work with NaNs.`
+				msg = `❌ Give me some real time ! Can't work with NaNs.`
 			} else if (pomLength < 5) {
 				msg =
-					'Less than five minutes is too short. Why bother pomming for this ? Do it right away !'
+					'❌ Less than five minutes is too short. Why bother pomming for this ? Do it right away !'
 			} else if (pomLength > 25) {
-				msg = `Woah there ! You'll perform better if you split that task and make every part take less than 25 minutes.`
+				msg = `❌ Woah there ! You'll perform better if you split that task and make every part take less than 25 minutes.`
 			}
 
 			await message.channel.send(msg)

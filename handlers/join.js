@@ -5,11 +5,23 @@
 const Discord = require('discord.js')
 
 module.exports = async ({ bot, message, util }) => {
+	// It's not possible to use !join in a DM channel
+	// Prevent that
+	if (
+		message.author.dmChannel &&
+		message.author.dmChannel.id === message.channel.id
+	) {
+		message.channel.send(
+			`❌ It's not possible to join somebody in a DM channel.`
+		)
+		return
+	}
+
 	// The user has to mention the user he wants to join
 	// Extract that mention
 	if (message.mentions.users.size === 0) {
 		message.channel.send(
-			`You need to mention the user you want to join. Usage: **${
+			`❌ You need to mention the user you want to join. Usage: **${
 				bot.config.prefix
 			} join @user**`
 		)
@@ -24,7 +36,7 @@ module.exports = async ({ bot, message, util }) => {
 
 	if (pom) {
 		message.channel.send(
-			`Hey ! You're already in a pom. One thing at a time.`
+			`❌ Hey ! You're already in a pom. One thing at a time.`
 		)
 		return
 	}
@@ -39,7 +51,7 @@ module.exports = async ({ bot, message, util }) => {
 
 	if (!pom) {
 		message.channel.send(
-			`I'm sorry, that user is not in a pom right now... Maybe start one on your own ? Usage: **${
+			`❌ I'm sorry, that user is not in a pom right now... Maybe start one on your own ? Usage: **${
 				bot.config.prefix
 			} start**`
 		)
@@ -49,7 +61,7 @@ module.exports = async ({ bot, message, util }) => {
 	// Check that the channel is the same (required)
 	if (pom.channelId !== message.channel.id) {
 		message.channel.send(
-			`I'd love for you to join that timer, but please do so in the channel the timer was started in.`
+			`❌ I'd love for you to join that timer, but please do so in the channel the timer was started in.`
 		)
 		return
 	}

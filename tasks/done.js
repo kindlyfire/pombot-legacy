@@ -53,9 +53,9 @@ module.exports = async ({ bot, pom }) => {
 
 	// Log in console
 	console.log(
-		`[DONE] Pom of length ${
-			pom.length
-		} minutes finished with ${pomUsers} users.`
+		`[DONE] Pom of length ${pom.length} minutes finished with ${
+			pomUsers.length
+		} users.`
 	)
 
 	// Remove the pom, and pom links

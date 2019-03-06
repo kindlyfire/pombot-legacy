@@ -63,4 +63,11 @@ module.exports = async ({ bot, message, util }) => {
 			)
 		}
 	}
+
+	// Message if the user is not in a pom
+	else {
+		message.channel.send(
+			`❌ You're not currently participating in any timer.`
+		)
+	}
 }
