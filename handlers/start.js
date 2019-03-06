@@ -46,7 +46,8 @@ module.exports = async ({ bot, message, util, args }) => {
 		let pom = {
 			startTimestamp: util.timeNowUTC(),
 			length: pomLength,
-			channelId: message.channel.id
+			channelId: message.channel.id,
+			serverId: message.guild ? message.guild.id : ''
 		}
 
 		let res = await bot.db
