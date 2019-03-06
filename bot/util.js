@@ -39,7 +39,7 @@ module.exports = (bot) => ({
 	// Get nicelly formatted start time and time left for pom
 	// { startedAt: '15:32 UTC', timeLeft: '6m 28s' }
 	getPomInformation(pom) {
-		let currentTimestamp = Math.floor(Date.now() / 1000)
+		let currentTimestamp = this.timeNowUTC()
 		let startDate = new Date(pom.startTimestamp * 1000)
 
 		let timeDiff = currentTimestamp - pom.startTimestamp
@@ -57,6 +57,49 @@ module.exports = (bot) => ({
 		}
 	},
 
+	// Get the user profile associated with a user
+	// If the Discord.js user is passed, we can also create a profile
+	//  if there is none
+	async getUserProfile(userId, user = null) {
+		// Get the profile if there is one
+		let res = await this.queryArray(
+			bot.db.table('profiles').getAll(userId, { index: 'userId' })
+		)
+
+		if (res && res.length > 0) {
+			return res[0]
+		}
+
+		if (!user) {
+			return null
+		}
+
+		// Create the profile
+		let profile = {
+			userId,
+			tag: user.tag,
+			avatarURL: user.avatarURL,
+
+			// Number of poms started
+			pomsStarted: 0,
+
+			// Number of poms finished
+			pomsFinished: 0,
+
+			// Total time spent in poms
+			pomsTotalTime: 0
+		}
+
+		res = await bot.db
+			.table('profiles')
+			.insert(profile)
+			.run(bot.conn)
+
+		profile.id = res.generated_keys[0]
+
+		return profile
+	},
+
 	// Runs a RethinkDB query, and transforms it into an array
 	async queryArray(query) {
 		let res = await query.run(bot.conn)
@@ -67,5 +110,13 @@ module.exports = (bot) => ({
 	// Clamp a number between min and max
 	clamp(n, min, max) {
 		return Math.min(Math.max(min, n), max)
+	},
+
+	// Returns the current UTC time
+	// In seconds from unix epoch
+	timeNowUTC() {
+		return (
+			Math.floor(Date.now() / 1000) + new Date().getTimezoneOffset() * 60
+		)
 	}
 })

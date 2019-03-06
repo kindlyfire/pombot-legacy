@@ -7,6 +7,17 @@ const Discord = require('discord.js')
 module.exports = async ({ bot, pom }) => {
 	let { util } = bot
 
+	// First, check that the pom still exists
+	//  return if not
+	let tmpPom = await bot.db
+		.table('poms')
+		.get(pom.id)
+		.run(bot.conn)
+
+	if (!tmpPom) {
+		return
+	}
+
 	// Get all users in this pom
 	let pomUsers = await util.queryArray(
 		bot.db.table('user_poms').getAll(pom.id, { index: 'pomId' })

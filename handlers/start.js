@@ -9,6 +9,9 @@ module.exports = async ({ bot, message, util, args }) => {
 	// Check if the user has a pomodoro already
 	let pom = await util.getAssignedPom(message.author.id)
 
+	// Get profile
+	let profile = await util.getUserProfile(message.author.id, message.author)
+
 	// If he has, yell at him for overworking
 	if (pom) {
 		message.channel.send(
@@ -41,7 +44,7 @@ module.exports = async ({ bot, message, util, args }) => {
 
 		// Save the pom
 		let pom = {
-			startTimestamp: Math.floor(Date.now() / 1000),
+			startTimestamp: util.timeNowUTC(),
 			length: pomLength,
 			channelId: message.channel.id
 		}
@@ -55,7 +58,7 @@ module.exports = async ({ bot, message, util, args }) => {
 		let userPom = {
 			userId: message.author.id,
 			pomId: pom.id,
-			joinedAt: Math.floor(Date.now() / 1000)
+			joinedAt: util.timeNowUTC()
 		}
 
 		res = await bot.db

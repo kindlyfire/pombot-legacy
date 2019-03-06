@@ -12,8 +12,13 @@ module.exports = async ({ bot, message, util }) => {
 	if (pom) {
 		let pomInfo = util.getPomInformation(pom)
 
+		// Get a list of users in the pom, with their profile data
 		let pomUsers = await util.queryArray(
-			bot.db.table('user_poms').getAll(pom.id, { index: 'pomId' })
+			bot.db
+				.table('user_poms')
+				.getAll(pom.id, { index: 'pomId' })
+				.eqJoin('userId', bot.db.table('profiles'), { index: 'userId' })
+				.zip()
 		)
 
 		let embed = new Discord.RichEmbed()
@@ -24,11 +29,21 @@ module.exports = async ({ bot, message, util }) => {
 					pom.length
 				} minutes long pomodoro timer` +
 					(pomUsers.length > 1
-						? ` with ${pomUsers.length - 1} other people.`
+						? ` with ${pomUsers.length - 1} other ${
+								pomUsers.length === 2 ? 'person' : 'people'
+						  }.`
 						: '.')
 			)
 			.addField('Started at', pomInfo.startedAt, true)
 			.addField('Time left', pomInfo.timeLeft, true)
+
+		if (pomUsers.length > 1) {
+			embed.addField(
+				'Participants',
+				`(${pomUsers.length}) ` +
+					pomUsers.map((u) => `**${u.tag}**`).join(', ')
+			)
+		}
 
 		message.channel.send({
 			embed
