@@ -1,6 +1,6 @@
 # Database
 
-The database is RethinkDB. The connection can we configured in `config.js` (`db` key). Because it's a document-based database, the data schema is unclear. This document details each table and what it contains, trying to use TypeScript interfaces (I didn't check them to be valid though). There's an interface for every table, indexes are specified
+The database is RethinkDB. The connection can be configured in `config.js` (`db` key). Because it's a document-based database, the data schema is unclear. This document details each table and what it contains, trying to use TypeScript interfaces (I didn't check them to be valid though). There's an interface for every table, indexes are specified
 
 ```ts
 // Indexes: channelId, serverId
@@ -18,9 +18,10 @@ interface user_poms {
 	joinedAt: number
 }
 
-// Indexes: userId
+// Indexes: userId, serverId
 interface profiles {
 	userId: string // Discord User ID
+	serverId: string // Discord Server ID
 	tag: string // Discord User tag
 	avatarURL: string // Discord User avatarURL
 	pomsStarted: number

@@ -10,7 +10,11 @@ module.exports = async ({ bot, message, util, args }) => {
 	let pom = await util.getAssignedPom(message.author.id)
 
 	// Get profile
-	let profile = await util.getUserProfile(message.author.id, message.author)
+	let profile = await util.getUserProfile(
+		message.author.id,
+		message.guild.id,
+		message.author
+	)
 
 	// If he has, yell at him for overworking
 	if (pom) {
@@ -65,6 +69,20 @@ module.exports = async ({ bot, message, util, args }) => {
 		res = await bot.db
 			.table('user_poms')
 			.insert(userPom)
+			.run(bot.conn)
+
+		console.log(profile)
+
+		// Increment user stat pomsStarted
+		await bot.db
+			.table('profiles')
+			.get(profile.id)
+			.update({
+				pomsStarted: bot.db
+					.row('pomsStarted')
+					.default(0)
+					.add(1)
+			})
 			.run(bot.conn)
 
 		// Set completion timeout

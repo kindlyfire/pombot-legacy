@@ -29,7 +29,11 @@ module.exports = async ({ bot, message, util }) => {
 	}
 
 	// Get profile
-	let profile = await util.getUserProfile(message.author.id, message.author)
+	let profile = await util.getUserProfile(
+		message.author.id,
+		message.guild.id,
+		message.author
+	)
 
 	// Then, check if this user is not *already* in a pom
 	let pom = await util.getAssignedPom(message.author.id)

@@ -130,6 +130,12 @@ module.exports = {
 		{
 			commands: ['help'],
 			handler: require('../handlers/help')
+		},
+
+		// Leaderboard
+		{
+			commands: ['lb', 'leaderboard'],
+			handler: require('../handlers/leaderboard')
 		}
 	]
 }

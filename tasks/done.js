@@ -23,6 +23,34 @@ module.exports = async ({ bot, pom }) => {
 		bot.db.table('user_poms').getAll(pom.id, { index: 'pomId' })
 	)
 
+	// Update their time spent in a pom
+	let pomUsersProfiles = await Promise.all(
+		pomUsers.map(async (u) => {
+			return {
+				pomUser: u,
+				profile: await bot.util.getUserProfile(u.userId, pom.serverId)
+			}
+		})
+	)
+
+	await Promise.all(
+		pomUsersProfiles.map(({ pomUser, profile }) => {
+			let timeInPom =
+				pom.startTimestamp + pom.length * 60 - pomUser.joinedAt
+
+			return bot.db
+				.table('profiles')
+				.get(profile.id)
+				.update({
+					pomsTotalTime: bot.db
+						.row('pomsTotalTime')
+						.default(0)
+						.add(timeInPom)
+				})
+				.run(bot.conn)
+		})
+	)
+
 	// Find the right channel to send the message to
 	if (!bot.client.channels.has(pom.channelId)) {
 		console.error('Could not find channel to end pom in.')

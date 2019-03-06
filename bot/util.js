@@ -60,10 +60,15 @@ module.exports = (bot) => ({
 	// Get the user profile associated with a user
 	// If the Discord.js user is passed, we can also create a profile
 	//  if there is none
-	async getUserProfile(userId, user = null) {
+	async getUserProfile(userId, serverId, user = null) {
 		// Get the profile if there is one
 		let res = await this.queryArray(
-			bot.db.table('profiles').getAll(userId, { index: 'userId' })
+			bot.db
+				.table('profiles')
+				.getAll(userId, { index: 'userId' })
+				.filter({
+					serverId
+				})
 		)
 
 		if (res && res.length > 0) {
@@ -77,6 +82,7 @@ module.exports = (bot) => ({
 		// Create the profile
 		let profile = {
 			userId,
+			serverId,
 			tag: user.tag,
 			avatarURL: user.avatarURL,
 
