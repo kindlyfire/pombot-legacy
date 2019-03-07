@@ -94,6 +94,11 @@ module.exports = async ({ bot, message, util }) => {
 			.zip()
 	)
 
+	// Filter out any profiles that are not in this server
+	pomUsers = pomUsers.filter(
+		(u) => u.serverId === (message.guild ? message.guild.id : '')
+	)
+
 	let embed = new Discord.RichEmbed()
 		.setAuthor(message.author.username, message.author.avatarURL)
 		.setColor(0xfc5d5d)
