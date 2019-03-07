@@ -150,5 +150,23 @@ module.exports = (bot) => ({
 		}
 
 		return str.trim()
+	},
+
+	// Is the bot enabled in this channel ?
+	async checkBotEnabledIn(channelId) {
+		let isEnabled = await bot.db
+			.table('channels')
+			.getAll(channelId, { index: 'channelId' })
+			.count()
+			.run(bot.conn)
+
+		return isEnabled > 0
+	},
+
+	// Schedule the deletion of a message
+	scheduleDeletion(messages = []) {
+		setTimeout(() => {
+			Promise.all(messages.map((m) => m.delete())).catch(console.error)
+		}, 10000)
 	}
 })

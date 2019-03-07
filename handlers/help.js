@@ -13,16 +13,11 @@ module.exports = async ({ bot, message }) => {
 			`Equivalent to **!pom status**. Will tell you the pom you're in, time started and time left.`
 		)
 		.addField(
-			`${bot.config.prefix} start`,
-			`Start a new pomorodo timer of 25 minutes. You may also indicate another length between 5 and 25 minutes.`
+			`${bot.config.prefix} leave`,
+			`Leave the channel pomodoro tracker`
 		)
 		.addField(
-			`${bot.config.prefix} stop`,
-			`Stop the pomodoro timer or leave a group timer. Any time spent in the pom will be lost.` +
-				`\nAlias: **!pom leave**`
-		)
-		.addField(
-			`${bot.config.prefix} join @user`,
+			`${bot.config.prefix} join`,
 			`Join another user in his pomodoro adventure !`
 		)
 		.addField(

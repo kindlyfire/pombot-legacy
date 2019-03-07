@@ -30,16 +30,38 @@ module.exports = {
 		this.client.on('message', (message) => this.handleMessage(message))
 
 		// Load timeouts for poms in database
-		this.loadPoms()
+		// this.loadPoms()
+
+		console.log('[INFO] Bot has loaded')
 	},
 
 	// Handle a message from Discord.js
-	handleMessage(message) {
+	async handleMessage(message) {
 		let args = message.content.split(' ')
 
-		// Check if the message starts with the required prefix
-		if (args[0] !== this.config.prefix) {
-			return
+		// Check bot prefix
+		let isFullSeparator =
+			this.config.prefix[this.config.prefix.length - 1] === ' '
+
+		// Sep is like "!pom " (notice the space)
+		if (isFullSeparator) {
+			if (args[0] !== this.config.prefix.trim()) {
+				return
+			}
+		}
+
+		// Sep is like "!": no space
+		//  and command is glued to prefix
+		else {
+			if (!args[0].startsWith(this.config.prefix)) {
+				return
+			}
+
+			args = [
+				this.config.prefix,
+				args[0].slice(this.config.prefix.length),
+				...args.slice(1)
+			]
 		}
 
 		// Create an array of arguments passed to the bot
@@ -51,11 +73,35 @@ module.exports = {
 		}
 
 		// Run the right message handler
-		let handler = this.handlers.find((h) => h.commands.includes(args[0]))
+		let handler = this
+		let oldHandler
+		let i = 0
+
+		while (handler && handler.handlers) {
+			oldHandler = handler
+			handler = handler.handlers.find((h) => h.commands.includes(args[i]))
+			i += 1
+		}
 
 		// If no handler was found, run the special 404 handler
 		if (!handler) {
-			handler = this.handlers.find((h) => h.commands.includes('404'))
+			if (oldHandler.handler) {
+				handler = oldHandler
+			} else {
+				handler = this.handlers.find((h) => h.commands.includes('404'))
+			}
+		}
+
+		// Check if the handler *should* be run (the 'botEnabled' flag)
+		if (handler.flags && handler.flags.includes('botEnabled')) {
+			let isEnabled = await this.util.checkBotEnabledIn(
+				message.channel.id
+			)
+
+			if (!isEnabled) {
+				await message.channel.send('not enabled')
+				return
+			}
 		}
 
 		// Run the handler
@@ -92,54 +138,62 @@ module.exports = {
 				let m = await message.channel.send(
 					`❌ That command does not exist. Get the full list of commands right in your inbox with **${
 						bot.config.prefix
-					} help**.`
+					}help**.`
 				)
 
 				// Delete the message after 12 seconds
-				setTimeout(() => {
-					m.delete()
-				}, 12000)
+				// setTimeout(() => {
+				// 	m.delete()
+				// }, 12000)
 			}
 		},
 
-		// Status of the currently assigned pom
+		// Admin commands
 		{
-			commands: ['status'],
-			handler: require('../handlers/status')
+			commands: ['admin'],
+			handlers: [
+				{
+					commands: ['enable'],
+					handler: require('../handlers/adm/enable')
+				},
+				{
+					commands: ['disable'],
+					handler: require('../handlers/adm/disable')
+				}
+			]
 		},
 
-		// Start a new pom (for this user)
+		// Leave the channel pom
 		{
-			commands: ['start'],
-			handler: require('../handlers/start')
-		},
-
-		// Stop a pom (for this user)
-		{
+			flags: ['botEnabled'],
 			commands: ['stop', 'leave'],
-			handler: require('../handlers/stop')
+			handler: require('../handlers/leave')
 		},
 
-		// Join a pom (from another usr)
+		// Join the channel pom
 		{
+			flags: ['botEnabled'],
 			commands: ['join'],
 			handler: require('../handlers/join')
 		},
 
 		// Help
 		{
+			flags: ['botEnabled'],
 			commands: ['help'],
 			handler: require('../handlers/help')
 		},
 
 		// Leaderboard
 		{
+			flags: ['botEnabled'],
 			commands: ['lb', 'leaderboard'],
 			handler: require('../handlers/leaderboard')
 		},
 
 		// Stats
 		{
+			flags: ['botEnabled'],
 			commands: ['stats'],
 			handler: require('../handlers/stats')
 		}

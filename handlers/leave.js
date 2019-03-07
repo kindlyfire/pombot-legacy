@@ -1,5 +1,5 @@
 //
-// Join the channel pom
+// Leave the channel pom
 //
 
 module.exports = ({ message }) => {
